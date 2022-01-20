@@ -1,0 +1,1 @@
+This is where you should include each slides respective image if you are using automatic labelling.
