@@ -176,15 +176,7 @@ class Post:
 
 
 
-# slide images are already in a specific folder
-# the program will visit the folder
-# and use the correct image for each slide
-# note that the front cover is called slide0      
 
-
-
-# creating the post
-p = Post()
 
 
 
