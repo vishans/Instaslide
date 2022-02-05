@@ -1,5 +1,7 @@
 
 
+from random import randint
+from unittest.mock import NonCallableMagicMock
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 from corners import full_corners
 from sizer import fitInImage
@@ -8,6 +10,13 @@ from parsing import parse, syntaxCheck
 from formatting import formatParagraph
 from time import strftime
 import PIL
+import os
+from colorthief import ColorThief
+
+
+print('here ' + os.getcwd())
+
+os.chdir(os.getcwd() + '//')
 
 
 
@@ -15,6 +24,11 @@ import PIL
 class CorePostCreator:
 
     def __init__(self) -> None:
+        dir = os.path.abspath(__file__)
+        (dir.split('\\'))
+        os.chdir('\\'.join(dir.split('\\')[:-2]))
+        # print('hello '+ os.path.dirname(os.path.abspath(__file__)))
+       
         self.backgroundImagePath = r'Assets\bg-blue.jpg'
         self.HEIGHT = 1080
         self.WIDTH = 1080
@@ -108,7 +122,7 @@ class CorePostCreator:
 
     
 
-    def createSlide(self,imagePath, autoResize= True, offset = (0,0), article='hello world', flairText = None,flairColor = '#ff0800',backgroundImage = None, finalImageSavePath = '', numerator = '1',denomenator = '5'):
+    def createSlide(self,imagePath, autoResize= True, offset = (0,0), article='hello world', flairText = None,flairColor = '',backgroundImage = None, finalImageSavePath = '', numerator = '1',denomenator = '5'):
 
 
         if backgroundImage:
@@ -159,6 +173,10 @@ class CorePostCreator:
         
         #flair rendering
         if flairText:
+            cl = ColorThief(imagePath).get_palette(10)
+            flairColor = cl[randint(2,len(cl)-1)] if flairColor == '' else flairColor
+            
+            # print( colorthief.ColorThief(imagePath).get_palette(4))
             
             self.addFlairText(flairText,cmpo, flairColor)
 
@@ -200,6 +218,7 @@ class CorePostCreator:
 
                 width = xF + 55#(len(formattedFlairText) * 19) +(20-len(formattedFlairText))
                 try:
+                   
                     self.addFlair(cmpo,width=width, col=flairColor)
                 except:
                     print('\t An unknown error occurred when rendering flair text. Flair background color fall back triggered: red. ')
@@ -335,7 +354,7 @@ class CorePostCreator:
         print('\tArticle could not be rendered\n')
 
     
-    def frontPage(self,imagePath,title ='Les 5 Actus du', sub_title='', fontSize = 95, finalImageSavePath = '', frameColor = '', swipeIconColor = (242,242,242) ):
+    def frontPage(self,imagePath,title ='Ban aktialité', sub_title='', fontSize = 95, finalImageSavePath = '', frameColor = '', swipeIconColor = None, order_text=2, order_frame= 2 ):
         
         photo = Image.open(imagePath).convert('RGBA')
         # xp, yp = photo.size
@@ -377,7 +396,8 @@ class CorePostCreator:
         img.paste(f,box)
 
 
-        textColor = '#E4E4E4'
+        # textColor = '#E4E4E4'
+        textColor = (ColorThief(imagePath).get_palette(5))[order_text]
         param, text = parse(title)
 
         writeText(text,param,img,self.frontPageFont, startPos=((self.WIDTH-x)//2,((self.HEIGHT-y)//2)+150), defaultColor=textColor,fontSize=fontSize)
@@ -398,14 +418,13 @@ class CorePostCreator:
         # mask.show()
         
         # mask.show()
-        from colorthief import ColorThief
-        solidcolor = Image.new('RGB',(1080,1080), ColorThief(r'zezi.jpg').get_color(1) if not frameColor else frameColor)
+        solidcolor = Image.new('RGB',(1080,1080), (ColorThief(imagePath).get_palette(10))[order_frame] if not frameColor else frameColor)
         #'#DF021B')
 
         
         # solidcolor.show()
         final_image = Image.composite(solidcolor,img,mask)
-        self.addSwipeToReadIcon(final_image,(900,900),swipeIconColor=swipeIconColor)
+        self.addSwipeToReadIcon(final_image,(900,900),swipeIconColor=textColor if not swipeIconColor else swipeIconColor)
         # # mask.show()
         print('\t Front cover successfully rendered.\n')
         if finalImageSavePath:
@@ -528,6 +547,7 @@ class CorePostCreator:
        
         self.addVerticalLogo(cmpo)
 
+
         if finalImageSavePath:
             cmpo.save(finalImageSavePath)
 
@@ -543,7 +563,7 @@ class CorePostCreator:
         draw = ImageDraw.Draw(text_logo)
         x,y = draw.textsize(text, ImageFont.truetype(self.logoFont, fontSize))
         padding = 10
-        text_logo = Image.new('RGBA', (x+padding,y+padding),'#78C857')
+        text_logo = Image.new('RGBA', (x+padding,y+padding),self.backgroundColor)
         full_corners(text_logo,15)
         # # draw = ImageDraw.Draw(text_logo)
         params,logoText = parse('@Aktialit<brown>e_</brown>')
@@ -582,6 +602,4 @@ class CorePostCreator:
 if __name__ == '__main__':
 
 
-    CorePostCreator().frontPage(r'zezi.jpg','Les <red>5</red> Actus de la', '<red>semaine</red>', swipeIconColor=(0,255,2))
-
-
+    CorePostCreator().frontPage(r'articleImages\image0.jpg', order_text=1)

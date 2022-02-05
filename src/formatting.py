@@ -17,7 +17,7 @@ def formatParagraph(exp, width=15):
 
         if c == '&':
             c = exp[i+1]
-            word +=c
+            word += '&' + c
             wordLen +=1
             i+=2
             continue
