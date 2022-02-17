@@ -1,7 +1,5 @@
 
-
 from random import randint
-from unittest.mock import NonCallableMagicMock
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 from corners import full_corners
 from sizer import fitInImage
@@ -12,13 +10,7 @@ from time import strftime
 import PIL
 import os
 from colorthief import ColorThief
-
-
-print('here ' + os.getcwd())
-
-os.chdir(os.getcwd() + '//')
-
-
+from posterBG import PosterBG
 
 
 class CorePostCreator:
@@ -27,7 +19,7 @@ class CorePostCreator:
         dir = os.path.abspath(__file__)
         (dir.split('\\'))
         os.chdir('\\'.join(dir.split('\\')[:-2]))
-        # print('hello '+ os.path.dirname(os.path.abspath(__file__)))
+        
        
         self.backgroundImagePath = r'Assets\bg-blue.jpg'
         self.HEIGHT = 1080
@@ -78,8 +70,7 @@ class CorePostCreator:
         rect_w = self.INNER_RECT_WIDTH if not rect_w else rect_w
 
         # placing round rectangle at the center
-        # h,w = (self.HEIGHT - self.INNER_RECT_HEIGHT)//2,(self.WIDTH - self.INNER_RECT_WIDTH)//2
-        # draw.rounded_rectangle(((w, h), (w+self.INNER_RECT_WIDTH,h+self.INNER_RECT_HEIGHT)), 20, fill=color)
+        
 
 
         h,w = (self.HEIGHT - rect_h)//2,(self.WIDTH - rect_w)//2
@@ -88,7 +79,7 @@ class CorePostCreator:
 
     def __drawRoundedRectAtCentre2(self,img,color = 'white', rect_h = None, rect_w = None):
 
-        # draw = ImageDraw.Draw(img)
+        
 
         rect_h = self.INNER_RECT_HEIGHT if not rect_h else rect_h
         rect_w = self.INNER_RECT_WIDTH if not rect_w else rect_w
@@ -101,38 +92,35 @@ class CorePostCreator:
         outline = Image.open(self.instaGradientBackgroundPath).convert('RGBA')
 
         outline = outline.resize((self.WIDTH,self.HEIGHT))
-        # outline.show()
-        # input()
+        
 
         mask = Image.new('L',(self.WIDTH,self.HEIGHT))
         mask_draw = ImageDraw.Draw(mask)
         mask_draw.rounded_rectangle(((w, h), (w+rect_w,h+rect_h)), 20, fill=color)
         solid_c = Image.new('RGBA', (self.WIDTH,self.HEIGHT), self.backgroundColor)
-        # solid_c.show()
-        # print(mask.size)
-        # print(outline.size)
-        # print(solid_c.size)
-
-        # input()
+        
         rainbow = Image.composite(outline,solid_c, mask)
         return rainbow
-        # rainbow.show()
-        # input()
+        
 
 
     
 
-    def createSlide(self,imagePath, autoResize= True, offset = (0,0), article='hello world', flairText = None,flairColor = '',backgroundImage = None, finalImageSavePath = '', numerator = '1',denomenator = '5'):
+    def createSlide(self,imagePath, autoResize= True, offset = (0,0), article='hello world', flairText = None,flairColor = '',backgroundImage = 'default', finalImageSavePath = '', numerator = '1',denomenator = '5',PosterbackgroundColor = 'red', Postertext = '<brown>a</brown>ktialité', PosterfontSize= 25,PosterXspacing= 20, PosterYspacing= 20, PosterinitialTextPos = (-10,-10), PosterfontPath = r'Assets\Helvetica Neue W01 66 Medium It.ttf'):
 
 
-        if backgroundImage:
+        if backgroundImage == 'gradient':
         
             img = Image.open(self.backgroundImagePath)
             img = img.resize((self.HEIGHT,self.WIDTH),Image.ANTIALIAS)
 
-        else:
+        elif backgroundImage == 'default':
 
             img = Image.new('RGB',(self.WIDTH,self.HEIGHT),color=self.backgroundColor)
+
+        elif backgroundImage == 'poster':
+
+            img = PosterBG((1080,1080), PosterbackgroundColor, Postertext,PosterfontSize,PosterXspacing,PosterYspacing,PosterinitialTextPos, PosterfontPath).createPoster()
 
         self.__drawRoundedRectAtCentre(img,self.articleAreaColor)
 
@@ -174,7 +162,7 @@ class CorePostCreator:
         #flair rendering
         if flairText:
             cl = ColorThief(imagePath).get_palette(10)
-            flairColor = cl[randint(2,len(cl)-1)] if flairColor == '' else flairColor
+            flairColor = cl[3] if flairColor == '' else flairColor
             
             # print( colorthief.ColorThief(imagePath).get_palette(4))
             
@@ -354,7 +342,7 @@ class CorePostCreator:
         print('\tArticle could not be rendered\n')
 
     
-    def frontPage(self,imagePath,title ='Ban aktialité', sub_title='', fontSize = 95, finalImageSavePath = '', frameColor = '', swipeIconColor = None, order_text=2, order_frame= 2 ):
+    def frontPage(self,imagePath,title ='Ban aktialité', sub_title='', fontSize = 95, finalImageSavePath = '', frameColor = '', swipeIconColor = None, order_text=2, order_frame= 2, textColor = None ):
         
         photo = Image.open(imagePath).convert('RGBA')
         # xp, yp = photo.size
@@ -397,7 +385,7 @@ class CorePostCreator:
 
 
         # textColor = '#E4E4E4'
-        textColor = (ColorThief(imagePath).get_palette(5))[order_text]
+        textColor = (ColorThief(imagePath).get_palette(5))[order_text] if not textColor else textColor
         param, text = parse(title)
 
         writeText(text,param,img,self.frontPageFont, startPos=((self.WIDTH-x)//2,((self.HEIGHT-y)//2)+150), defaultColor=textColor,fontSize=fontSize)
@@ -601,5 +589,6 @@ class CorePostCreator:
 
 if __name__ == '__main__':
 
-
-    CorePostCreator().frontPage(r'articleImages\image0.jpg', order_text=1)
+    article = '''<#4CAF50>zezi</#4CAF50>'''
+    
+    CorePostCreator().createSlide(imagePath='zezi.jpg', article=article, flairText='hello')

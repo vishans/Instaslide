@@ -139,4 +139,8 @@ def writeText(text, param, image,fontPath ,startPos = (10,100), defaultColor = '
             p_index+=1
 
 
+    # image.show()
+    
+
+
    
