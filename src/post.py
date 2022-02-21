@@ -49,7 +49,7 @@ class Post:
     def addFrontCover(self, imagePath = '', title='Ban aktialité', sub_title='', frameColor='', swipeIconColor = (242,242,242), textColor=None):
         
         if self.frontCover:
-            print('You can only add a single Front Cover per Post/n')
+            print('You can only add a single Front Cover per Post\n')
             return
 
 
@@ -131,8 +131,10 @@ class Post:
             if you then skipped a page. now u r rendering slide 2 since slide 1 has been skipped,
             you have to provide an image1.jpg. 
             Note slide0 is always the front cover.'''
-
+            print('befroe auto')
             self.__automaticImagePathLabelling(Imagespath)
+            print('afterr auto')
+
 
         if self.frontCover:
             front, slides = self.queue[0], self.queue[1:]
@@ -187,12 +189,19 @@ class Post:
 
         only_names = [s.split('.')[0] for s in ldir]
         current_name = 'image' + str(counter)
-        os.chdir(self.articleImagesPath)
+        # os.chdir(self.articleImagesPath)
         for i, d in enumerate(self.queue):
+
+            if i > len(images)-1:
+                break
+            
+
+
             current_name = 'image' + str(counter)
 
 
             while not(current_name in only_names):
+                
                 counter+=1 
                 current_name = 'image' + str(counter)
 
