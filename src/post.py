@@ -123,7 +123,7 @@ class Post:
 
 
     def compile(self,Imagespath = 'articleImages'):
-        
+        print(f'Current dir is {os.getcwd()}')
         if Imagespath:
 
             '''Automatic path labelling requires the right image name for each slide.

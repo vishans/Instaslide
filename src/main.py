@@ -14,9 +14,7 @@ p.addFrontCover(frameColor='red')
 
 p.addSlide(article='hel')
 
-p.addSlide(article='zizag', backgroundImage='poster', PosterbackgroundColor='black', Postertext='<white>aktialite</white>')
-p.skipAPage()
-p.addSlide(article='fff', PosterbackgroundColor='black', Postertext='<white>aktialite</white>', imagePath='zezi.jpg')
+p.addSlide(article='zizag', backgroundImage='poster', PosterbackgroundColor='black')
 
 
 
